@@ -1,0 +1,20 @@
+# The gateway is the ONLY service of the domains that publishes a port to the host.
+name: opti-api-gateway
+
+services:
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: opti/api-gateway:local
+    environment:
+      FRONT_ORIGIN: ${FRONT_ORIGIN:-http://localhost:3000}
+    ports:
+      - "${GATEWAY_PORT:-8000}:8000"
+    networks:
+      - platform
+    restart: unless-stopped
+
+networks:
+  platform:
+    external: true

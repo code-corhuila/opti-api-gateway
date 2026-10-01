@@ -1,0 +1,20 @@
+# Written to conf.d by the image's entrypoint, which substitutes ${FRONT_ORIGIN}.
+
+# Rate limits: general, and a much stricter one for sign-in (password guessing).
+limit_req_zone $binary_remote_addr zone=api:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=login:10m rate=10r/m;
+limit_req_status 429;
+
+# CORS: only the origin of the front. An unknown origin gets no Access-Control-Allow-Origin at all.
+# Never "*" together with credentials.
+map $http_origin $cors_origin {
+    default "";
+    "${FRONT_ORIGIN}" $http_origin;
+}
+
+# The gateway only checks that a credential is PRESENT and shaped like a bearer token; every
+# service validates it (signature, expiry, role) by itself, because internal calls skip the gateway.
+map $http_authorization $has_credential {
+    default 0;
+    "~^Bearer\s+\S+$" 1;
+}
