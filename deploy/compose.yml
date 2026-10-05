@@ -9,6 +9,10 @@ services:
     image: opti/api-gateway:local
     environment:
       FRONT_ORIGIN: ${FRONT_ORIGIN:-http://localhost:3000}
+    volumes:
+      # Frame photos (HU-16): same volume products-api writes to, mounted read-only here and
+      # served under /media/frames/ (see nginx/routes/media.conf).
+      - frame-images:/data/frame-images:ro
     ports:
       - "${GATEWAY_PORT:-8000}:8000"
     networks:
@@ -18,3 +22,6 @@ services:
 networks:
   platform:
     external: true
+
+volumes:
+  frame-images:
