@@ -1,11 +1,11 @@
-# Routes of the sales domain. The upstream is a VARIABLE, so NGINX resolves it on every request:
-# if sales-api is down only these routes answer 503 and all the others keep working.
+# Routes of the sales domain. Rendered by docker-entrypoint.d/15-render-routes.sh, substituting
+# ${SALES_API_URL}.
 
 location /api/v1/work-orders {
     if ($request_method = OPTIONS) { include /etc/nginx/snippets/preflight.conf; }
     if ($has_credential = 0) { return 401; }
     limit_req zone=api burst=60 nodelay;
-    set $sales_api http://sales-api:8080;
+    set $sales_api ${SALES_API_URL};
     include /etc/nginx/snippets/proxy.conf;
     proxy_pass $sales_api;
 }
@@ -14,7 +14,7 @@ location /api/v1/invoices {
     if ($request_method = OPTIONS) { include /etc/nginx/snippets/preflight.conf; }
     if ($has_credential = 0) { return 401; }
     limit_req zone=api burst=60 nodelay;
-    set $sales_api http://sales-api:8080;
+    set $sales_api ${SALES_API_URL};
     include /etc/nginx/snippets/proxy.conf;
     proxy_pass $sales_api;
 }
@@ -23,7 +23,7 @@ location /api/v1/reports {
     if ($request_method = OPTIONS) { include /etc/nginx/snippets/preflight.conf; }
     if ($has_credential = 0) { return 401; }
     limit_req zone=api burst=60 nodelay;
-    set $sales_api http://sales-api:8080;
+    set $sales_api ${SALES_API_URL};
     include /etc/nginx/snippets/proxy.conf;
     proxy_pass $sales_api;
 }
