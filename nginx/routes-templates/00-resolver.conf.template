@@ -1,0 +1,6 @@
+# Names are resolved on EVERY request (not once at start): with a static upstream block a domain
+# that is down at start would keep the whole gateway from starting. Locally (Docker Compose) this
+# defaults to Docker's own embedded DNS (127.0.0.11); on a host like Render, where upstreams are
+# public HTTPS URLs instead of Compose service names, it needs a real public DNS resolver instead.
+resolver ${NGINX_RESOLVER} valid=10s ipv6=off;
+resolver_timeout 2s;
