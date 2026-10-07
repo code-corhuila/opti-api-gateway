@@ -1,0 +1,39 @@
+# Routes of the auth domain. Rendered from this template by docker-entrypoint.d/15-render-routes.sh,
+# substituting ${AUTH_API_URL} - a Docker Compose service name locally, a public HTTPS URL on Render
+# (free-tier services can only receive traffic over their public URL, not the private network).
+
+# Sign-in is the only public route: the person has no credential yet. It has its own strict rate limit.
+location = /api/v1/auth/login {
+    if ($request_method = OPTIONS) { include /etc/nginx/snippets/preflight.conf; }
+    limit_req zone=login burst=5 nodelay;
+    set $auth_api ${AUTH_API_URL};
+    include /etc/nginx/snippets/proxy.conf;
+    proxy_pass $auth_api;
+}
+
+location /api/v1/auth {
+    if ($request_method = OPTIONS) { include /etc/nginx/snippets/preflight.conf; }
+    if ($has_credential = 0) { return 401; }
+    limit_req zone=api burst=60 nodelay;
+    set $auth_api ${AUTH_API_URL};
+    include /etc/nginx/snippets/proxy.conf;
+    proxy_pass $auth_api;
+}
+
+location /api/v1/users {
+    if ($request_method = OPTIONS) { include /etc/nginx/snippets/preflight.conf; }
+    if ($has_credential = 0) { return 401; }
+    limit_req zone=api burst=60 nodelay;
+    set $auth_api ${AUTH_API_URL};
+    include /etc/nginx/snippets/proxy.conf;
+    proxy_pass $auth_api;
+}
+
+location /api/v1/notifications {
+    if ($request_method = OPTIONS) { include /etc/nginx/snippets/preflight.conf; }
+    if ($has_credential = 0) { return 401; }
+    limit_req zone=api burst=60 nodelay;
+    set $auth_api ${AUTH_API_URL};
+    include /etc/nginx/snippets/proxy.conf;
+    proxy_pass $auth_api;
+}
