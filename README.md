@@ -76,3 +76,9 @@ stays healthy (what CI runs, since nothing is behind it there).
 
 Only the names of the services on the `platform` network (`auth-api`, `customers-api`,
 `products-api`, `sales-api`, `workflow`). It publishes the only port of the domains (`8000`).
+
+## Cuerpos de pagos con comprobante
+
+Solo `/api/v1/invoices/{uuid}/payments` admite hasta 3 MiB para transportar un comprobante de 2 MiB codificado en base64 y sus metadatos JSON. Las demás rutas mantienen 1 MiB. Se conservan credencial, rate limit, CORS y correlación; la API valida el archivo y los permisos. El error 413 ya no anuncia incorrectamente un límite único para todas las rutas.
+
+Verificación cloud en nginx 1.29.8 aislado: `nginx -t`; cuerpo de 2,8 MB en pagos alcanza el upstream; 3,2 MB produce 413; 1,5 MB en la ruta general produce 413. No se modifican upstreams ni despliegues existentes.
